@@ -81,6 +81,10 @@ kubectl -n kubernetes-dashboard \
 
 - Done! Enjoy! 🎉
 
+## Annotations
+
+
+
 ## Alternative
 
 There is also an awesome project which could integrate with Cloudflare Tunnel as CRD, check it out [adyanth/cloudflare-operator](https://github.com/adyanth/cloudflare-operator)!

@@ -9,6 +9,10 @@ import (
 	"github.com/oliverbaehler/cloudflare-tunnel-ingress-controller/pkg/exposure"
 )
 
+var (
+	hostname = "ingress.example.com"
+)
+
 func Test_fromExposureToCloudflareIngress(t *testing.T) {
 	type args struct {
 		ctx      context.Context
@@ -36,17 +40,22 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				exposure: exposure.Exposure{
-					Hostname:      "ingress.example.com",
+					Hostname:      hostname,
 					ServiceTarget: "http://10.0.0.1:80",
 					PathPrefix:    "/",
 					IsDeleted:     false,
+					Config: exposure.ExposureConfig{
+						HttpHostHeader: hostname,
+					},
 				},
 			},
 			want: &cloudflare.UnvalidatedIngressRule{
-				Hostname:      "ingress.example.com",
-				Path:          "/",
-				Service:       "http://10.0.0.1:80",
-				OriginRequest: nil,
+				Hostname: hostname,
+				Path:     "/",
+				Service:  "http://10.0.0.1:80",
+				OriginRequest: &cloudflare.OriginRequestConfig{
+					HTTPHostHeader: &hostname,
+				},
 			},
 			wantErr: false,
 		},
@@ -55,17 +64,22 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				exposure: exposure.Exposure{
-					Hostname:      "ingress.example.com",
+					Hostname:      hostname,
 					ServiceTarget: "http://10.0.0.1:80",
 					PathPrefix:    "/prefix",
 					IsDeleted:     false,
+					Config: exposure.ExposureConfig{
+						HttpHostHeader: hostname,
+					},
 				},
 			},
 			want: &cloudflare.UnvalidatedIngressRule{
-				Hostname:      "ingress.example.com",
-				Path:          "/prefix",
-				Service:       "http://10.0.0.1:80",
-				OriginRequest: nil,
+				Hostname: hostname,
+				Path:     "/prefix",
+				Service:  "http://10.0.0.1:80",
+				OriginRequest: &cloudflare.OriginRequestConfig{
+					HTTPHostHeader: &hostname,
+				},
 			},
 			wantErr: false,
 		}, {
@@ -73,18 +87,22 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				exposure: exposure.Exposure{
-					Hostname:      "ingress.example.com",
+					Hostname:      hostname,
 					ServiceTarget: "https://10.0.0.1:443",
 					PathPrefix:    "/",
 					IsDeleted:     false,
+					Config: exposure.ExposureConfig{
+						HttpHostHeader: hostname,
+					},
 				},
 			},
 			want: &cloudflare.UnvalidatedIngressRule{
-				Hostname: "ingress.example.com",
+				Hostname: hostname,
 				Path:     "/",
 				Service:  "https://10.0.0.1:443",
 				OriginRequest: &cloudflare.OriginRequestConfig{
-					NoTLSVerify: boolPointer(true),
+					NoTLSVerify:    boolPointer(true),
+					HTTPHostHeader: &hostname,
 				},
 			},
 		}, {
@@ -92,21 +110,23 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				exposure: exposure.Exposure{
-					Hostname:      "ingress.example.com",
+					Hostname:      hostname,
 					ServiceTarget: "https://10.0.0.1:443",
 					PathPrefix:    "/",
 					IsDeleted:     false,
 					Config: exposure.ExposureConfig{
-						ProxySSLVerifyEnabled: boolPointer(true),
+						ProxySSLVerifyEnabled: boolPointer(false),
+						HttpHostHeader:        hostname,
 					},
 				},
 			},
 			want: &cloudflare.UnvalidatedIngressRule{
-				Hostname: "ingress.example.com",
+				Hostname: hostname,
 				Path:     "/",
 				Service:  "https://10.0.0.1:443",
 				OriginRequest: &cloudflare.OriginRequestConfig{
-					NoTLSVerify: boolPointer(true),
+					NoTLSVerify:    boolPointer(true),
+					HTTPHostHeader: &hostname,
 				},
 			},
 		}, {
@@ -114,21 +134,23 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				exposure: exposure.Exposure{
-					Hostname:      "ingress.example.com",
+					Hostname:      hostname,
 					ServiceTarget: "https://10.0.0.1:443",
 					PathPrefix:    "/",
 					IsDeleted:     false,
 					Config: exposure.ExposureConfig{
 						ProxySSLVerifyEnabled: boolPointer(true),
+						HttpHostHeader:        hostname,
 					},
 				},
 			},
 			want: &cloudflare.UnvalidatedIngressRule{
-				Hostname: "ingress.example.com",
+				Hostname: hostname,
 				Path:     "/",
 				Service:  "https://10.0.0.1:443",
 				OriginRequest: &cloudflare.OriginRequestConfig{
-					NoTLSVerify: boolPointer(false),
+					NoTLSVerify:    boolPointer(false),
+					HTTPHostHeader: &hostname,
 				},
 			},
 		},
