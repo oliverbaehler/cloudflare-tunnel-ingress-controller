@@ -9,15 +9,17 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
+func intToDurationSeconds(t int64) time.Duration {
+	return time.Duration(t) * time.Second
+
+}
 func stringToCloudflareTime(s string) (*cloudflare.TunnelDuration, error) {
 	intValue, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
 		// Handle the error (e.g., log it or return an error)
 		return nil, errors.Wrapf(err, "Error converting to int64")
 	} else {
-		// Convert the int64 to time.Duration. Assuming tlsTimeout represents seconds.
-		durationValue := time.Duration(intValue) * time.Second
-		tunnelDurationValue := cloudflare.TunnelDuration{Duration: durationValue}
+		tunnelDurationValue := cloudflare.TunnelDuration{Duration: intToDurationSeconds(intValue)}
 		return &tunnelDurationValue, nil
 	}
 }

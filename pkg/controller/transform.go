@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -93,70 +94,30 @@ func FromIngressToExposure(ctx context.Context, logger logr.Logger, kubeClient c
 				return nil, errors.Errorf("path type in ingress %s/%s is %s, which is not supported", ingress.GetNamespace(), ingress.GetName(), *path.PathType)
 			}
 
+			// Target
+			target := fmt.Sprintf("%s://%s:%d", scheme, host, port)
+
+			// TLS Verification
+			if strings.HasPrefix(target, "https://") {
+				if cfg.NoTLSVerify == nil {
+					cfg.NoTLSVerify = boolPointer(true)
+				}
+			}
+
+			// Overwrite Host Header with target
+			cfg.HTTPHostHeader = &hostname
+
 			pathPrefix := path.Path
 
 			result = append(result, exposure.Exposure{
 				Hostname:      hostname,
-				ServiceTarget: fmt.Sprintf("%s://%s:%d", scheme, host, port),
+				ServiceTarget: target,
 				PathPrefix:    pathPrefix,
 				IsDeleted:     isDeleted,
-				Config:        *cfg,
+				OriginRequest: *cfg,
 			})
 		}
 	}
 
 	return result, nil
-}
-
-func annotationProperties(annotations map[string]string) (*exposure.ExposureConfig, error) {
-	config := &exposure.ExposureConfig{}
-
-	for key, value := range annotations {
-		switch key {
-		case AnnotationProxySSLVerify:
-			enabled, err := evalAnnotationBool(value)
-			if err != nil {
-				return nil, errors.Wrapf(err, "parsing annotation value (%s)", key)
-			}
-			config.ProxySSLVerifyEnabled = enabled
-
-		case AnnotationTLSTimeout:
-			tlsTimeout, err := stringToCloudflareTime(value)
-			if err != nil {
-				return nil, errors.Wrapf(err, "parsing annotation value (%s)", key)
-			}
-			config.TLSTimeout = tlsTimeout
-
-		case AnnotationConnectionTimeount:
-			connectTimeout, err := stringToCloudflareTime(value)
-			if err != nil {
-				return nil, errors.Wrapf(err, "parsing annotation value (%s)", key)
-			}
-			config.ConnectTimeout = connectTimeout
-
-		case AnnotationChunkedEncoding:
-			enabled, err := evalAnnotationBool(value)
-			if err != nil {
-				return nil, errors.Wrapf(err, "parsing annotation value (%s)", key)
-			}
-			config.DisableChunkedEncoding = enabled
-
-		case AnnotationHTTP20Origin:
-			enabled, err := evalAnnotationBool(value)
-			if err != nil {
-				return nil, errors.Wrapf(err, "parsing annotation value (%s)", key)
-			}
-			config.HTTP2Origin = enabled
-
-		case AnnotationTCPKeepAliveTimeout:
-			tunnelDuration, err := stringToCloudflareTime(value)
-			if err != nil {
-				return nil, errors.Wrapf(err, "parsing annotation value (%s)", key)
-			}
-			config.KeepAliveTimeout = tunnelDuration
-
-		}
-	}
-
-	return config, nil
 }

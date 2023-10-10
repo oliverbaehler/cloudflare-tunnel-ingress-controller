@@ -1,0 +1,109 @@
+project_name: cloudflare-tunnel-ingress-controller
+env:
+  - COSIGN_EXPERIMENTAL=true
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod download
+gomod:
+  proxy: true
+dockers:
+  - image_templates: 
+    - 'ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Tag }}'
+    - 'ghcr.io/oliverbaehler/{{ .ProjectName }}:latest'
+    dockerfile: image/cloudflare-tunnel-ingress-controller/Dockerfile
+    goos: linux
+    goarch: amd64
+    use: buildx
+    skip_push: false
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.description=Cloudflare Tunnel Ingress Controller"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--label=org.opencontainers.image.vendor=Oliver Baehler"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+      - "--label=org.opencontainers.image.source=https://github.com/oliverbaehler/{{ .ProjectName }}"
+      - "--label=org.opencontainers.image.authors=Oliver Baehler"
+      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/oliverbaehler/{{ .ProjectName }}/master/README.md"
+      - "--label=io.artifacthub.package.license=Apache-2.0"
+
+builds:
+  - main: cmd/{{ .ProjectName }}/main.go
+    binary: '{{ .ProjectName }}'
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+      - arm64
+    goos:
+      - linux
+      - darwin
+    flags:
+      - -trimpath
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    ldflags:
+      - >-
+        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.Version={{ .Tag }}
+        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.GitCommit={{ .Commit }}
+        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.BuildDate={{ .Date }}
+release:
+  footer: |
+    **Full Changelog**: https://github.com/oliverbaehler/{{ .ProjectName }}/compare/{{ .PreviousTag }}...{{ .Tag }}
+    
+    * * *
+
+    **Docker Images**
+    - `ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Tag }}`
+    - `ghcr.io/oliverbaehler/{{ .ProjectName }}:latest`
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+    - '^test:'
+    - '^chore'
+    - 'merge conflict'
+    - Merge pull request
+    - Merge remote-tracking branch
+    - Merge branch
+  groups:
+    - title: Dependency updates
+      regexp: '^.*?(feat|fix)\(deps\)!?:.+$'
+      order: 300
+    - title: 'New Features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 100
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 200
+    - title: 'Documentation updates'
+      regexp: ^.*?doc(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: 'Build process updates'
+      regexp: ^.*?build(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: Other work
+      order: 9999
+sboms:
+  - artifacts: archive
+signs:
+- cmd: cosign
+  stdin: '{{ .Env.COSIGN_PWD }}'
+  args:
+  - "sign-blob"
+  - "--key=cosign.key"
+  - "--output-signature=${signature}"
+  - "${artifact}"
+  - "--yes" # needed on cosign 2.0.0+
+  artifacts: all
+docker_signs:
+- artifacts: all
+  cmd: cosign
+  stdin: '{{ .Env.COSIGN_PWD }}'
+

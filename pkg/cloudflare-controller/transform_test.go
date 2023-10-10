@@ -44,8 +44,9 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 					ServiceTarget: "http://10.0.0.1:80",
 					PathPrefix:    "/",
 					IsDeleted:     false,
-					Config: exposure.ExposureConfig{
-						HttpHostHeader: hostname,
+					OriginRequest: cloudflare.OriginRequestConfig{
+						HTTPHostHeader: &hostname,
+						NoTLSVerify:    boolPointer(true),
 					},
 				},
 			},
@@ -55,6 +56,7 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 				Service:  "http://10.0.0.1:80",
 				OriginRequest: &cloudflare.OriginRequestConfig{
 					HTTPHostHeader: &hostname,
+					NoTLSVerify:    boolPointer(true),
 				},
 			},
 			wantErr: false,
@@ -68,8 +70,8 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 					ServiceTarget: "http://10.0.0.1:80",
 					PathPrefix:    "/prefix",
 					IsDeleted:     false,
-					Config: exposure.ExposureConfig{
-						HttpHostHeader: hostname,
+					OriginRequest: cloudflare.OriginRequestConfig{
+						HTTPHostHeader: &hostname,
 					},
 				},
 			},
@@ -91,8 +93,8 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 					ServiceTarget: "https://10.0.0.1:443",
 					PathPrefix:    "/",
 					IsDeleted:     false,
-					Config: exposure.ExposureConfig{
-						HttpHostHeader: hostname,
+					OriginRequest: cloudflare.OriginRequestConfig{
+						NoTLSVerify: boolPointer(true),
 					},
 				},
 			},
@@ -101,8 +103,7 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 				Path:     "/",
 				Service:  "https://10.0.0.1:443",
 				OriginRequest: &cloudflare.OriginRequestConfig{
-					NoTLSVerify:    boolPointer(true),
-					HTTPHostHeader: &hostname,
+					NoTLSVerify: boolPointer(true),
 				},
 			},
 		}, {
@@ -114,9 +115,8 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 					ServiceTarget: "https://10.0.0.1:443",
 					PathPrefix:    "/",
 					IsDeleted:     false,
-					Config: exposure.ExposureConfig{
-						ProxySSLVerifyEnabled: boolPointer(false),
-						HttpHostHeader:        hostname,
+					OriginRequest: cloudflare.OriginRequestConfig{
+						Http2Origin: boolPointer(false),
 					},
 				},
 			},
@@ -125,8 +125,7 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 				Path:     "/",
 				Service:  "https://10.0.0.1:443",
 				OriginRequest: &cloudflare.OriginRequestConfig{
-					NoTLSVerify:    boolPointer(true),
-					HTTPHostHeader: &hostname,
+					Http2Origin: boolPointer(false),
 				},
 			},
 		}, {
@@ -138,9 +137,8 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 					ServiceTarget: "https://10.0.0.1:443",
 					PathPrefix:    "/",
 					IsDeleted:     false,
-					Config: exposure.ExposureConfig{
-						ProxySSLVerifyEnabled: boolPointer(true),
-						HttpHostHeader:        hostname,
+					OriginRequest: cloudflare.OriginRequestConfig{
+						Http2Origin: boolPointer(true),
 					},
 				},
 			},
@@ -149,8 +147,53 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 				Path:     "/",
 				Service:  "https://10.0.0.1:443",
 				OriginRequest: &cloudflare.OriginRequestConfig{
-					NoTLSVerify:    boolPointer(false),
-					HTTPHostHeader: &hostname,
+					Http2Origin: boolPointer(true),
+				},
+			},
+		},
+		{
+			name: "http2-disabled",
+			args: args{
+				ctx: context.Background(),
+				exposure: exposure.Exposure{
+					Hostname:      hostname,
+					ServiceTarget: "https://10.0.0.1:443",
+					PathPrefix:    "/",
+					IsDeleted:     false,
+					OriginRequest: cloudflare.OriginRequestConfig{
+						Http2Origin: boolPointer(false),
+					},
+				},
+			},
+			want: &cloudflare.UnvalidatedIngressRule{
+				Hostname: hostname,
+				Path:     "/",
+				Service:  "https://10.0.0.1:443",
+				OriginRequest: &cloudflare.OriginRequestConfig{
+					Http2Origin: boolPointer(false),
+				},
+			},
+		},
+		{
+			name: "http2-enabled",
+			args: args{
+				ctx: context.Background(),
+				exposure: exposure.Exposure{
+					Hostname:      hostname,
+					ServiceTarget: "https://10.0.0.1:443",
+					PathPrefix:    "/",
+					IsDeleted:     false,
+					OriginRequest: cloudflare.OriginRequestConfig{
+						Http2Origin: boolPointer(true),
+					},
+				},
+			},
+			want: &cloudflare.UnvalidatedIngressRule{
+				Hostname: hostname,
+				Path:     "/",
+				Service:  "https://10.0.0.1:443",
+				OriginRequest: &cloudflare.OriginRequestConfig{
+					Http2Origin: boolPointer(true),
 				},
 			},
 		},
@@ -159,11 +202,11 @@ func Test_fromExposureToCloudflareIngress(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := fromExposureToCloudflareIngress(tt.args.ctx, tt.args.exposure)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("fromExposureToCloudflareIngress() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("fromExposureToCloudflareIngress() error = %+v, wantErr %+v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("fromExposureToCloudflareIngress() got = %v, want %v", got, tt.want)
+				t.Errorf("fromExposureToCloudflareIngress() got = %+v, want %+v", *got.OriginRequest, *tt.want.OriginRequest)
 			}
 		})
 	}

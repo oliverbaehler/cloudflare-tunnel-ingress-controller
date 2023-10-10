@@ -12,16 +12,5 @@ type Exposure struct {
 	// IsDeleted is the flag to indicate if the exposure is deleted.
 	IsDeleted bool
 	// Ingress configuration
-	Config ExposureConfig
-}
-
-type ExposureConfig struct {
-	ProxySSLVerifyEnabled  *bool
-	TLSTimeout             *cloudflare.TunnelDuration
-	ConnectTimeout         *cloudflare.TunnelDuration
-	DisableChunkedEncoding *bool
-	HTTP2Origin            *bool
-	HttpHostHeader         string
-	KeepAliveConnections   *int
-	KeepAliveTimeout       *cloudflare.TunnelDuration
+	OriginRequest cloudflare.OriginRequestConfig
 }

@@ -1,3 +1,9 @@
+# Cloudflare Tunnel Ingress Controller
+
+TLDR; This project simplifies exposing Kubernetes services to the internet easily and securely using Cloudflare Tunnel.
+
+##  Fork
+
 Currently a hardfork of the origin project. Following changes are available:
 
 - [x] Hardened controller and tunnel deployment
@@ -5,10 +11,7 @@ Currently a hardfork of the origin project. Following changes are available:
 - [x] Always set HTTP Host Header for exposed ingresses (security measure)
 - [x] Support externalServices service types
 
-
-# Cloudflare Tunnel Ingress Controller
-
-TLDR; This project simplifies exposing Kubernetes services to the internet easily and securely using Cloudflare Tunnel.
+I am happy to merge against to original project, if the changes are welcome.
 
 ## Prerequisites
 
@@ -41,7 +44,7 @@ minikube start
 - Add Helm Repository;
 
 ```bash
-helm repo add strrl.dev https://helm.strrl.dev
+helm repo add cloudflare-ingress-controller https://helm.strrl.dev
 helm repo update
 ```
 
@@ -51,7 +54,7 @@ helm repo update
 helm upgrade --install --wait \
   -n cloudflare-tunnel-ingress-controller --create-namespace \
   cloudflare-tunnel-ingress-controller \
-  strrl.dev/cloudflare-tunnel-ingress-controller \
+  cloudflare-ingress-controller/cloudflare-tunnel-ingress-controller \
   --set=cloudflare.apiToken="<cloudflare-api-token>",cloudflare.accountId="<cloudflare-account-id>",cloudflare.tunnelName="<your-favorite-tunnel-name>" 
 ```
 
@@ -82,6 +85,22 @@ kubectl -n kubernetes-dashboard \
 - Done! Enjoy! 🎉
 
 ## Annotations
+
+The following annotations can be set on Ingress basis to influence to cloudflare Ingress configuration:
+
+| Annotation | Description | Type | Default |
+| :--------- | :---------- | :--- | :------ |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/proxy-ssl-verify` | When `on`, TLS verification is performed on the certificate presented by your origin. When `off`, TLS verification is disabled. This will allow any certificate from the origin to be accepted. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#notlsverify). | `on` or `off` | `off` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/backend-protocol` | Scheme used to connect to the target | `http` or `https` | `http` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/connection-timeout` | Timeout for establishing a new TCP connection to your origin server. This excludes the time taken to establish TLS, which is controlled by `cloudflare-tunnel-ingress-controller.strrl.dev/tls-timeout`. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#connecttimeout).  | `Duration in seconds` | `10` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/chunked-encoding` | When `on`, cloudflared performs chunked transfer encoding when transferring data over HTTP/1.1. When `off`, chunked transfer encoding is disabled. This is useful if you are running a Web Server Gateway Interface (WSGI) server. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#disablechunkedencoding). | `on` or `off` | `nil` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/happy-eyeballs` | When `on`, cloudflared uses the Happy Eyeballs algorithm for IPv4/IPv6 fallback if your local network has misconfigured one of the protocols. When `off`, Happy Eyeballs is disabled. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#nohappyeyeballs). | `on` or `off` | `nil` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/http2Origin`| When `off`, cloudflared will connect to your origin with HTTP/1.1. When `on`, cloudflared will attempt to connect to your origin server using HTTP/2.0 instead of HTTP/1.1. HTTP/2.0 is a faster protocol for high traffic origins but requires you to deploy an SSL certificate on the origin. We recommend using this setting in conjunction with `cloudflare-tunnel-ingress-controller.strrl.dev/proxy-ssl-verify` so that you can use a self-signed certificate. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#http2origin). | `on` or `off` | `nil` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/tls-timeout`| Timeout for completing a TLS handshake to your origin server, if you have chosen to connect Tunnel to an HTTPS server. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#tlstimeout). | `Duration in seconds` | `nil` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/tcp-keep-alive`| The timeout after which a TCP keepalive packet is sent on a connection between Cloudflare and the origin server. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#tcpkeepalive). | `Duration in seconds` | `nil` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/tcp-keep-alive-connections`| Maximum number of idle keepalive connections between Cloudflare and your origin. This does not restrict the total number of concurrent connections. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#keepaliveconnections). | `int64` | `nil` |
+| `cloudflare-tunnel-ingress-controller.strrl.dev/tcp-keep-alive-timeout`| Timeout after which an idle keepalive connection can be discarded. See [Reference](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/origin-configuration/#keepalivetimeout). | `Duration in seconds`  | `nil` |
+
 
 
 
