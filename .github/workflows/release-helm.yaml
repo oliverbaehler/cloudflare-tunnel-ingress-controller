@@ -26,6 +26,10 @@ jobs:
         uses: sigstore/cosign-installer@main
         with:
           cosign-release: 'v2.2.0'
+      - name: Install BOM
+        uses: puerco/bom-installer@main
+        with:
+          bom-release: 'v0.5.1'
       - name: Publish Helm chart
         uses: oliverbaehler/helm-oci-chart-releaser@main
         with:
@@ -39,3 +43,5 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           update_dependencies: 'true' # Defaults to false
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PWD }}
