@@ -27,7 +27,7 @@ jobs:
         with:
           cosign-release: 'v2.2.0'
       - name: Install BOM
-        uses: oliverbaehler/bom-installer@main
+        uses: puerco/release-action/setup-bom@main
       - name: Publish Helm chart
         uses: oliverbaehler/helm-oci-chart-releaser@main
         with:
