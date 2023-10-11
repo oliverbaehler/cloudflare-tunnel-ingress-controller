@@ -38,6 +38,7 @@ jobs:
           app_version: ${{ steps.extract_version.outputs.version }}
           tag: ${{ steps.extract_version.outputs.version }}
           cosign_enabled: "true"
+          bom_enabled: "true"
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           update_dependencies: 'true' # Defaults to false
