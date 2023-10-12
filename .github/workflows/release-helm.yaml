@@ -16,6 +16,7 @@ jobs:
       packages: write # needed for ghcr access
     steps:
       - uses: actions/checkout@v2
+      - uses: anchore/sbom-action/download-syft@v0.14.2
       - name: "Extract Version"
         id: extract_version
         run: |
@@ -26,9 +27,11 @@ jobs:
         uses: sigstore/cosign-installer@main
         with:
           cosign-release: 'v2.2.0'
-      - name: Install BOM
-        uses: puerco/release-action/setup-bom@main
+      - name: Install signing key
+        run: |
+          echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
       - name: Publish Helm chart
+        id: helm_publish
         uses: oliverbaehler/helm-oci-chart-releaser@main
         with:
           registry: ghcr.io
@@ -37,10 +40,23 @@ jobs:
           path: "./helm/cloudflare-tunnel-ingress-controller/"
           app_version: ${{ steps.extract_version.outputs.version }}
           tag: ${{ steps.extract_version.outputs.version }}
-          cosign_enabled: "true"
-          bom_enabled: "true"
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           update_dependencies: 'true' # Defaults to false
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PWD }}
+
+      - name: CoSign | Sign
+        run: cosign sign --yes --key cosign.key ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
+
+      - name: CoSign | Attestation
+        run: |
+          cosign verify --key cosign.pub ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
+          syft ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }} -o spdx-json > sbom-spdx.json
+          cosign attest --predicate sbom-spdx.json --type spdx --key cosign.key ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
+          cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
+
+      - name: Cleanup signing keys
+        if: ${{ always() }}
+        run: rm -f cosign.key
+

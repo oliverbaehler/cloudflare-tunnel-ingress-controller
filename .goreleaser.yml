@@ -103,7 +103,11 @@ signs:
   - "--yes" # needed on cosign 2.0.0+
   artifacts: all
 docker_signs:
-- artifacts: all
-  cmd: cosign
+- cmd: cosign
+  artifacts: all
+  output: true
   stdin: '{{ .Env.COSIGN_PWD }}'
-
+  args:
+  - 'sign'
+  - '${artifact}@${digest}'
+  - --yes
