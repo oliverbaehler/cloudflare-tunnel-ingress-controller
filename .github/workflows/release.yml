@@ -22,7 +22,6 @@ jobs:
       - uses: sigstore/cosign-installer@v3.0.3
       - uses: anchore/sbom-action/download-syft@v0.14.2
       - name: ghcr-login
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v1
         with:
           registry: ghcr.io

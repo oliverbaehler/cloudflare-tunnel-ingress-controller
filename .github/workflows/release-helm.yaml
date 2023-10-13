@@ -40,8 +40,8 @@ jobs:
           path: "./helm/cloudflare-tunnel-ingress-controller/"
           app_version: ${{ steps.extract_version.outputs.version }}
           tag: ${{ steps.extract_version.outputs.version }}
-          #registry_username: ${{ github.actor }}
-          #registry_password: ${{ secrets.GITHUB_TOKEN }}
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.GITHUB_TOKEN }}
           update_dependencies: 'true' # Defaults to false
 
       - name: CoSign | Sign

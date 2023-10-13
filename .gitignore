@@ -25,3 +25,6 @@ hack/dev/cloudflare-api.yaml
 
 # go test coverage report
 cover.out
+
+# cosign
+cosign.key
