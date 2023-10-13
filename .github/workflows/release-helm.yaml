@@ -27,10 +27,9 @@ jobs:
         uses: sigstore/cosign-installer@main
         with:
           cosign-release: 'v2.2.0'
-      - name: Install signing key
+      - name: Signing Keys
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
-          cat cosign.key
       - name: Publish Helm chart
         id: helm_publish
         uses: oliverbaehler/helm-oci-chart-releaser@main
@@ -44,6 +43,22 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           update_dependencies: 'true' # Defaults to false
+
+      - name: CoSign | Login
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login -u ${{ github.actor }} --password-stdin ghcr.io
+
+      - name: CoSign | Public Key
+        run: echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
+
+      - name: CoSign | Attestation
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          cosign verify --key cosign.pub ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
+          syft ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }} -o spdx-json > sbom-spdx.json
+          cosign attest --predicate sbom-spdx.json --type spdx --key cosign.key ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
+          cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
 
       - name: CoSign | Sign
         env:
@@ -59,7 +74,9 @@ jobs:
           cosign attest --predicate sbom-spdx.json --type spdx --key cosign.key ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
           cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
 
-      - name: Cleanup signing keys
+      - name: Cleanup
         if: ${{ always() }}
-        run: rm -f cosign.key
+        run: |
+          docker logout ghcr.io
+          rm -f cosign.key
 
