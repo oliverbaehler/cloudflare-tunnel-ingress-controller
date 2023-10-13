@@ -30,6 +30,7 @@ jobs:
       - name: Install signing key
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
+          cat cosign.key
       - name: Publish Helm chart
         id: helm_publish
         uses: oliverbaehler/helm-oci-chart-releaser@main
