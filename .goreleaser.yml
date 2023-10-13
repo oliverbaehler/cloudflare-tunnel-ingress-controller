@@ -51,8 +51,8 @@ builds:
         -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.GitCommit={{ .Commit }}
         -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.BuildDate={{ .Date }}
 release:
-  extra_files:
-    - glob: "./cosign.pub"
+  #extra_files:
+  #  - glob: "./cosign.pub"
   footer: |
     **Full Changelog**: https://github.com/oliverbaehler/{{ .ProjectName }}/compare/{{ .PreviousTag }}...{{ .Tag }}
     
@@ -91,10 +91,15 @@ changelog:
     - title: Other work
       order: 9999
 sboms:
-  - artifacts: archive
+  - id: archive-sbom
+    cmd: syft
+    args: ["${artifact}", "--file", "${artifact}.sbom.json", "--output", "spdx-json"]
+    documents:
+      - "${artifact}.sbom.json"
+    artifacts: archive
 signs:
 - cmd: cosign
-  stdin: '{{ .Env.COSIGN_PWD }}'
+  stdin: '{{ .Env.COSIGN_PASSWORD }}'
   args:
   - "sign-blob"
   - "--key=cosign.key"
@@ -106,7 +111,7 @@ docker_signs:
 - cmd: cosign
   artifacts: all
   output: true
-  stdin: '{{ .Env.COSIGN_PWD }}'
+  stdin: '{{ .Env.COSIGN_PASSWORD }}'
   args:
   - 'sign'
   - '${artifact}@${digest}'

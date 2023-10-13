@@ -47,12 +47,12 @@ jobs:
 
       - name: CoSign | Sign
         env:
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PWD }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: cosign sign --yes --key cosign.key ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
 
       - name: CoSign | Attestation
         env:
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PWD }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           cosign verify --key cosign.pub ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
           syft ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }} -o spdx-json > sbom-spdx.json
