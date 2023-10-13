@@ -56,7 +56,7 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: cosign sign --yes --key cosign.key ${{ steps.helm_publish.outputs.image }}@${{ steps.helm_publish.outputs.digest }}
 
-      - name: CoSign | Attestation
+      - name: CoSign | Verification
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
