@@ -11,7 +11,7 @@ dockers:
   - image_templates: 
     - 'ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Tag }}'
     - 'ghcr.io/oliverbaehler/{{ .ProjectName }}:latest'
-    dockerfile: image/cloudflare-tunnel-ingress-controller/Dockerfile
+    dockerfile: image/cloudflare-tunnel-ingress-controller/Dockerfile.goreleaser
     goos: linux
     goarch: amd64
     use: buildx

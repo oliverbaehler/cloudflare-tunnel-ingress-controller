@@ -1,0 +1,9 @@
+# Use distroless as minimal base image to package the manager binary
+# Refer to https://github.com/GoogleContainerTools/distroless for more details
+FROM gcr.io/distroless/static:nonroot
+COPY cloudflare-tunnel-ingress-controller /cloudflare-tunnel-ingress-controller
+LABEL org.opencontainers.image.source=https://github.com/oliverbaehler/cloudflare-tunnel-ingress-controller
+WORKDIR /åå
+USER nonroot:nonroot
+
+ENTRYPOINT ["/cloudflare-tunnel-ingress-controllåer"]
