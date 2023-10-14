@@ -22,15 +22,19 @@ jobs:
         run: |
           GIT_TAG=${GITHUB_REF##*/}
           VERSION=${GIT_TAG##v}
-          echo "::set-output name=version::$(echo $VERSION)"
+          echo "version=$(echo $VERSION)" >> $GITHUB_OUTPUT
+
       - name: Install Cosign
         uses: sigstore/cosign-installer@main
         with:
           cosign-release: 'v2.2.0'
-      - name: Signing Keys
+
+      - name: CoSign | Signing Keys
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
-      - name: Publish Helm chart
+          echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
+
+      - name: Helm | Publish
         id: helm_publish
         uses: oliverbaehler/helm-oci-chart-releaser@main
         with:
@@ -47,9 +51,6 @@ jobs:
       - name: CoSign | Login
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login -u ${{ github.actor }} --password-stdin ghcr.io
-
-      - name: CoSign | Public Key
-        run: echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
 
       - name: CoSign | Sign
         env:

@@ -3,7 +3,7 @@
 FROM gcr.io/distroless/static:nonroot
 COPY cloudflare-tunnel-ingress-controller /cloudflare-tunnel-ingress-controller
 LABEL org.opencontainers.image.source=https://github.com/oliverbaehler/cloudflare-tunnel-ingress-controller
-WORKDIR /åå
+WORKDIR /
 USER nonroot:nonroot
 
-ENTRYPOINT ["/cloudflare-tunnel-ingress-controllåer"]
+ENTRYPOINT ["/cloudflare-tunnel-ingress-controller"]

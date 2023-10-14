@@ -28,3 +28,4 @@ cover.out
 
 # cosign
 cosign.key
+cosign.pub
