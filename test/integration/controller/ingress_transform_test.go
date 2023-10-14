@@ -675,7 +675,7 @@ var _ = Describe("transform ingress to exposure", func() {
 		Expect(exposure[0].PathPrefix).Should(Equal("/"))
 		Expect(exposure[0].IsDeleted).Should(BeFalse())
 		Expect(exposure[0].OriginRequest.NoTLSVerify).ShouldNot(BeNil())
-		Expect(*exposure[0].OriginRequest.NoTLSVerify).Should(BeFalse())
+		Expect(*exposure[0].OriginRequest.NoTLSVerify).Should(BeTrue())
 
 	})
 	It("should resolve https with proxy-ssl-verify enabled", func() {
@@ -763,7 +763,7 @@ var _ = Describe("transform ingress to exposure", func() {
 		Expect(exposure[0].ServiceTarget).Should(Equal("https://10.0.0.29:2333"))
 		Expect(exposure[0].PathPrefix).Should(Equal("/"))
 		Expect(exposure[0].IsDeleted).Should(BeFalse())
-		Expect(exposure[0].Config.ProxySSLVerifyEnabled).ShouldNot(BeNil())
-		Expect(*exposure[0].Config.ProxySSLVerifyEnabled).Should(BeTrue())
+		Expect(exposure[0].OriginRequest.NoTLSVerify).ShouldNot(BeNil())
+		Expect(*exposure[0].OriginRequest.NoTLSVerify).Should(BeFalse())
 	})
 })
