@@ -16,7 +16,6 @@ BUILD_DATE      ?= $(shell git log -1 --format="%at" | xargs -I{} sh -c 'if [ "$
 IMG_BASE        ?= $(REPOSITORY)/cloudflare-tunnel-ingress-controller
 IMG             ?= $(REGISTRY)/$(IMG_BASE)
 
-
 .PHONY: dev
 dev:
 	skaffold dev --namespace cloudflare-tunnel-ingress-controller-dev
