@@ -42,7 +42,7 @@ KO_TAGS             ?= "latest,$(VERSION)"
 LOCAL_CAPSULE_IMG := $(KO_REGISTRY)/github.com/$(IMG)
 ko-build: ko
 	@LD_FLAGS=$(LD_FLAGS) KOCACHE=$(KOCACHE) KO_DOCKER_REPO=$(KO_REGISTRY) \
-		$(KO) build  ./cmd/cloudflare-tunnel-ingress-controller/ --preserve-import-paths --tags=$(KO_TAGS) --push=false
+		$(KO) build ./cmd/cloudflare-tunnel-ingress-controller/ --preserve-import-paths --tags=$(KO_TAGS) --push=false
 
 .PHONY: docker-build-all
 docker-build: ko-build
@@ -57,7 +57,7 @@ ko-login: ko
 .PHONY: ko-publish
 ko-publish: ko-login ## Build and publish kyvernopre image (with ko)
 	@LD_FLAGS=$(LD_FLAGS) KOCACHE=$(KOCACHE) KO_DOCKER_REPO=$(IMG) \
-		$(KO) build --bare --tags=$(KO_TAGS)
+		$(KO) build ./cmd/cloudflare-tunnel-ingress-controller/ --bare --tags=$(KO_TAGS)
 
 .PHONY: docker-publish
 docker-publish: ko-publish
