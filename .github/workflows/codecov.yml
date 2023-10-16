@@ -15,6 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Check secret
+        id: checksecret
+        uses: oliverbaehler/github-actions/exists@8dfd42735c85f6c58d5d4d6f3232cd0e39d1fe73 # v0.1.0
+        with:
+          value: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/setup-go@v4
         with:
           go-version: '1.19'
@@ -22,6 +27,7 @@ jobs:
         run: |
           make integration-test
       - name: Upload coverage reports to Codecov
+        if: steps.checksecret.outputs.result == 'true'
         uses: codecov/codecov-action@v3
         with:
           files: ./test/integration/cover.out
