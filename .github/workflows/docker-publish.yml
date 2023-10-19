@@ -43,7 +43,7 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository_owner }}
-          version: ${{ github.ref_name }}
+          version: ${{ steps.extract_version.outputs.version }}
           sign-image: true
           sbom-name: cloudflare-tunnel-ingress-controller
           sbom-repository: ghcr.io/${{ github.repository_owner }}/sbom
