@@ -21,12 +21,12 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --config ./ct.yaml)
+          changed=$(ct list-changed --config .github/configs/ct.yaml)
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
       - name: Run chart-testing (lint)
-        run: ct lint --debug --config ./ct.yaml --lint-conf ./lintconf.yaml
+        run: ct lint --debug --config .github/configs/ct.yaml --lint-conf .github/configs/lintconf.yaml
       - name: Run docs-testing (helm-docs)
         id: helm-docs
         run: |
@@ -46,5 +46,5 @@ jobs:
 
       # Install Charts
       - name: Run chart-testing (install)
-        run: ct install --debug --config ./ct.yaml
+        run: ct install --debug --config .github/configs/ct.yaml
         if: steps.list-changed.outputs.changed == 'true'

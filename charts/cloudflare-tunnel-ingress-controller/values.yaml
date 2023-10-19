@@ -22,7 +22,7 @@ ingressClass:
   # -- Ingress class name
   name: cloudflare-tunnel
   # -- Ingress class controller
-  controllerValue: cloudflare-tunnel-ingress-controller
+  controllerValue: ""
   # -- Cluster default ingress class
   isDefaultClass: false
 
