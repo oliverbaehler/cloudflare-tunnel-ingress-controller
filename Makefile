@@ -13,7 +13,7 @@ GIT_MODIFIED_2  ?= $(shell git diff --quiet && echo "" || echo ".dirty")
 GIT_MODIFIED    ?= $(shell echo "$(GIT_MODIFIED_1)$(GIT_MODIFIED_2)")
 GIT_REPO        ?= $(shell git config --get remote.origin.url)
 BUILD_DATE      ?= $(shell git log -1 --format="%at" | xargs -I{} sh -c 'if [ "$(shell uname)" = "Darwin" ]; then date -r {} +%Y-%m-%dT%H:%M:%S; else date -d @{} +%Y-%m-%dT%H:%M:%S; fi')
-IMG_BASE        ?= $(REPOSITORY)/cloudflare-tunnel-ingress-controller
+IMG_BASE        ?= $(REPOSITORY)
 IMG             ?= $(REGISTRY)/$(IMG_BASE)
 
 .PHONY: dev
