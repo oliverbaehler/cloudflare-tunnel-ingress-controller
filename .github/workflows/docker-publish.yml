@@ -48,7 +48,7 @@ jobs:
           sbom-name: cloudflare-tunnel-ingress-controller
           sbom-repository: ghcr.io/${{ github.repository_owner }}/sbom
           signature-repository: ghcr.io/${{ github.repository_owner }}/signatures
-          main-path: ./
+          main-path: ./cmd/cloudflare-tunnel-ingress-controller/
         env:
           REPOSITORY: ${{ github.repository }}
           VERSION: ${{ steps.extract_version.outputs.version }}

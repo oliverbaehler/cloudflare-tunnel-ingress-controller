@@ -7,63 +7,10 @@ before:
     - go mod download
 gomod:
   proxy: true
-dockers:
-  - image_templates: 
-    - 'ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Version }}-amd64'
-    dockerfile: image/cloudflare-tunnel-ingress-controller/Dockerfile.goreleaser
-    goos: linux
-    goarch: amd64
-    use: buildx
-    skip_push: false
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.description=Cloudflare Tunnel Ingress Controller"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--label=org.opencontainers.image.vendor=Oliver Baehler"
-      - "--label=org.opencontainers.image.licenses=Apache-2.0"
-      - "--label=org.opencontainers.image.source=https://github.com/oliverbaehler/{{ .ProjectName }}"
-      - "--label=org.opencontainers.image.authors=Oliver Baehler"
-      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/oliverbaehler/{{ .ProjectName }}/master/README.md"
-      - "--label=io.artifacthub.package.license=Apache-2.0"
-  - image_templates: 
-    - 'ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Version }}-arm64v8'
-    dockerfile: image/cloudflare-tunnel-ingress-controller/Dockerfile.goreleaser
-    goos: linux
-    goarch: arm64
-    use: buildx
-    skip_push: false
-    build_flag_templates:
-      - --platform=linux/arm64/v8
-      - "--label=org.opencontainers.image.description=Cloudflare Tunnel Ingress Controller"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--label=org.opencontainers.image.vendor=Oliver Baehler"
-      - "--label=org.opencontainers.image.licenses=Apache-2.0"
-      - "--label=org.opencontainers.image.source=https://github.com/oliverbaehler/{{ .ProjectName }}"
-      - "--label=org.opencontainers.image.authors=Oliver Baehler"
-      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/oliverbaehler/{{ .ProjectName }}/master/README.md"
-      - "--label=io.artifacthub.package.license=Apache-2.0"
-docker_manifests:
-- name_template: 'ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Version }}'
-  image_templates:
-  - ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Version }}-amd64
-  - ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Version }}-arm64v8
-- name_template: 'ghcr.io/oliverbaehler/{{ .ProjectName }}:latest'
-  image_templates:
-  - ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Version }}-amd64
-  - ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Version }}-arm64v8
-
 
 builds:
   - main: cmd/{{ .ProjectName }}/main.go
-    binary: "{{ .ProjectName }}-{{ .OS }}-{{ .Arch }}"
+    binary: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
     env:
       - CGO_ENABLED=0
     goarch:
@@ -81,8 +28,6 @@ builds:
         -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.GitCommit={{ .Commit }}
         -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.BuildDate={{ .Date }}
 release:
-  extra_files:
-    - glob: "./cosign.pub"
   footer: |
     **Full Changelog**: https://github.com/oliverbaehler/{{ .ProjectName }}/compare/{{ .PreviousTag }}...{{ .Tag }}
     
@@ -126,16 +71,7 @@ signs:
 - cmd: cosign
   args:
   - "sign-blob"
-  - "--key=cosign.key"
   - "--output-signature=${signature}"
   - "${artifact}"
-  - "--yes" # needed on cosign 2.0.0+
+  - "--yes"
   artifacts: all
-docker_signs:
-- cmd: cosign
-  artifacts: all
-  output: true
-  args:
-  - 'sign'
-  - '${artifact}@${digest}'
-  - --yes
