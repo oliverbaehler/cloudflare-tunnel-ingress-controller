@@ -16,10 +16,10 @@ jobs:
   integration-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
       - name: Check secret
         id: checksecret
-        uses: oliverbaehler/github-actions/exists@8dfd42735c85f6c58d5d4d6f3232cd0e39d1fe73 # v0.1.0
+        uses: peak-scale/github-actions/exists@8dfd42735c85f6c58d5d4d6f3232cd0e39d1fe73 # v0.1.0
         with:
           value: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/setup-go@v4
