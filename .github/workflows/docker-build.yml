@@ -2,9 +2,6 @@ name: Build images
 permissions: {}
 
 on:
-  push:
-    branches:
-      - '*'
   pull_request:
     branches: [ "master", "main" ]
 

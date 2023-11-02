@@ -36,7 +36,7 @@ jobs:
         uses: sigstore/cosign-installer@11086d25041f77fe8fe7b9ea4e48e3b9192b8f19 # v3.1.2
       - name: Publish with KO
         id: publish
-        uses: oliverbaehler/github-actions/ko-publish-image@8dfd42735c85f6c58d5d4d6f3232cd0e39d1fe73 # v0.1.0
+        uses: peak-scale/github-actions/make-ko-publish@38322faabccd75abfa581c435e367d446b6d2c3b # v0.1.0
         with:
           makefile-target: docker-publish
           registry: ghcr.io
