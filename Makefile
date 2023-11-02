@@ -1,7 +1,5 @@
-VERSION          ?= $(shell git describe --abbrev=0 --tags --match "v*")
-ifndef VERSION
-VERSION          = $(GIT_HEAD_COMMIT)
-endif
+GIT_HEAD_COMMIT ?= $(shell git rev-parse --short HEAD)
+VERSION         ?= $(or $(shell git describe --abbrev=0 --tags --match "v*" 2>/dev/null),$(GIT_HEAD_COMMIT))
 
 # Defaults
 REGISTRY        ?= ghcr.io
@@ -14,7 +12,10 @@ GIT_MODIFIED    ?= $(shell echo "$(GIT_MODIFIED_1)$(GIT_MODIFIED_2)")
 GIT_REPO        ?= $(shell git config --get remote.origin.url)
 BUILD_DATE      ?= $(shell git log -1 --format="%at" | xargs -I{} sh -c 'if [ "$(shell uname)" = "Darwin" ]; then date -r {} +%Y-%m-%dT%H:%M:%S; else date -d @{} +%Y-%m-%dT%H:%M:%S; fi')
 IMG_BASE        ?= $(REPOSITORY)
-IMG             ?= $(REGISTRY)/$(IMG_BASE)
+IMG             ?= $(IMG_BASE):$(VERSION)
+FULL_IMG        ?= $(REGISTRY)/$(IMG_BASE)
+SRC_ROOT = $(shell git rev-parse --show-toplevel)
+
 
 .PHONY: dev
 dev:
@@ -34,13 +35,22 @@ setup-envtest:
 
 # Docker Image
 KOCACHE             ?= /tmp/ko-cache
-KO_REGISTRY         := ko.local
-KO_TAGS             ?= "latest,$(VERSION)"
+KO_TAGS         ?= "latest"
+ifdef VERSION
+KO_TAGS         := $(KO_TAGS),$(VERSION)
+endif
+
+LD_FLAGS        := "-X main.Version=$(VERSION) \
+					-X main.GitCommit=$(GIT_HEAD_COMMIT) \
+					-X main.GitTag=$(VERSION) \
+					-X main.GitTreeState=$(GIT_MODIFIED) \
+					-X main.BuildDate=$(BUILD_DATE) \
+					-X main.GitRepo=$(GIT_REPO)"
+
 
 .PHONY: ko-build
-LOCAL_CAPSULE_IMG := $(KO_REGISTRY)/github.com/$(IMG)
 ko-build: ko
-	@LD_FLAGS=$(LD_FLAGS) KOCACHE=$(KOCACHE) KO_DOCKER_REPO=$(KO_REGISTRY) \
+	@LD_FLAGS=$(LD_FLAGS) KOCACHE=$(KOCACHE) KO_DOCKER_REPO=$(FULL_IMG) \
 		$(KO) build ./cmd/cloudflare-tunnel-ingress-controller/ --preserve-import-paths --tags=$(KO_TAGS) --push=false
 
 .PHONY: docker-build-all
@@ -54,15 +64,12 @@ ko-login: ko
 	@$(KO) login $(REGISTRY) --username $(REGISTRY_USERNAME) --password $(REGISTRY_PASSWORD)
 
 .PHONY: ko-publish
-ko-publish: ko-login ## Build and publish kyvernopre image (with ko)
-	@LD_FLAGS=$(LD_FLAGS) KOCACHE=$(KOCACHE) KO_DOCKER_REPO=$(IMG) \
+ko-publish: ko-login
+	@LD_FLAGS=$(LD_FLAGS) KOCACHE=$(KOCACHE) KO_DOCKER_REPO=$(FULL_IMG) \
 		$(KO) build ./cmd/cloudflare-tunnel-ingress-controller/ --bare --tags=$(KO_TAGS)
 
 .PHONY: docker-publish
 docker-publish: ko-publish
-
-# Helm Chart
-SRC_ROOT = $(shell git rev-parse --show-toplevel)
 
 helm-docs: HELMDOCS_VERSION := v1.11.0
 helm-docs:
