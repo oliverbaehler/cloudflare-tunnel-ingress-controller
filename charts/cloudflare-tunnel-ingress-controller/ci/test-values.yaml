@@ -1,0 +1,4 @@
+cloudflare:
+  apiToken: "dummy"
+  accountId: "dummy"
+  tunnelName: "dummy"

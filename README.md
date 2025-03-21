@@ -1,15 +1,17 @@
+> [!IMPORTANT]
+> This project is a permanent hard-fork of the [origin project](https://github.com/STRRL/cloudflare-tunnel-ingress-controller). Following changes are available:
+> - [x] **Security-Hardened controller and tunnel deployment**
+> - [x] Support Tunnel [configuration via annotations](#annotations)
+> - [x] Always set HTTP Host Header for exposed ingresses (security measure)
+> - [x] Support externalServices service types
+
 # Cloudflare Tunnel Ingress Controller
+
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/cloudflare-tunnel-ingress-controller)](https://artifacthub.io/packages/search?repo=cloudflare-tunnel-ingress-controller)
 
 TLDR; This project simplifies exposing Kubernetes services to the internet easily and securely using Cloudflare Tunnel.
 
-##  Fork
-
-Currently a hardfork of the origin project. Following changes are available:
-
-- [x] Hardened controller and tunnel deployment
-- [x] Support Tunnel configuration via annotations
-- [x] Always set HTTP Host Header for exposed ingresses (security measure)
-- [x] Support externalServices service types
+## Fork
 
 I am happy to merge against to original project, if the changes are welcome.
 
@@ -40,25 +42,6 @@ Want to DIY? The following instructions would help your bootstrap a minikube Kub
 ```bash
 minikube start
 ```
-
-- Add Helm Repository;
-
-```bash
-helm repo add cloudflare-ingress-controller https://helm.strrl.dev
-helm repo update
-```
-
-- Install with Helm:
-
-```bash
-helm upgrade --install --wait \
-  -n cloudflare-tunnel-ingress-controller --create-namespace \
-  cloudflare-tunnel-ingress-controller \
-  cloudflare-ingress-controller/cloudflare-tunnel-ingress-controller \
-  --set=cloudflare.apiToken="<cloudflare-api-token>",cloudflare.accountId="<cloudflare-account-id>",cloudflare.tunnelName="<your-favorite-tunnel-name>"
-```
-
-> if the tunnel does not exist, controller will create it for you.
 
 - Then enable some awesome features in minikube, like kubernetes-dashboard:
 
