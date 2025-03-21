@@ -12,10 +12,11 @@ type IngressControllerOptions struct {
 	IngressClassName    string
 	ControllerClassName string
 	CFTunnelClient      *cloudflarecontroller.TunnelClient
+	StaticBackend       string
 }
 
 func RegisterIngressController(logger logr.Logger, mgr manager.Manager, options IngressControllerOptions) error {
-	controller := NewIngressController(logger.WithName("ingress-controller"), mgr.GetClient(), options.IngressClassName, options.ControllerClassName, options.CFTunnelClient)
+	controller := NewIngressController(logger.WithName("ingress-controller"), mgr.GetClient(), options.IngressClassName, options.ControllerClassName, options.CFTunnelClient, options.StaticBackend)
 	err := builder.
 		ControllerManagedBy(mgr).
 		For(&networkingv1.Ingress{}).

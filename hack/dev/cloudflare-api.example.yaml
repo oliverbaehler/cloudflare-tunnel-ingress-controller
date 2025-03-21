@@ -1,9 +1,0 @@
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: cloudflare-api
-stringData:
-  api-token: ""
-  cloudflare-account-id: ""
-  cloudflare-tunnel-name: ""

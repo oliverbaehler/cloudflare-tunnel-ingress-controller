@@ -1,0 +1,68 @@
+name: Coverage
+
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - "main"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sast:
+    name: "SAST"
+    runs-on: ubuntu-24.04
+    env:
+      GO111MODULE: on
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version-file: 'go.mod'
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@43fee884f668c23601e0bec7a8c095fba226f889 # v2.22.1
+        with:
+          args: '-no-fail -fmt sarif -out gosec.sarif ./...'
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@83923549f688e42b34d0b90ee94725f7c30532fc
+        with:
+          sarif_file: gosec.sarif
+  unit_tests:
+    name: "Unit tests"
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version-file: 'go.mod'
+      - name: Unit Test
+        run: make test
+      - name: Check secret
+        id: checksecret
+        uses: ./.github/actions/exists
+        with:
+          value: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload Report to Codecov
+        if: ${{ steps.checksecret.outputs.result == 'true' }}
+        uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3 # v5.3.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: projectcapsule/cortex-proxy
+          files: ./coverage.out
+          fail_ci_if_error: true
+          verbose: true

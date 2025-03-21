@@ -30,7 +30,7 @@ builds:
 release:
   footer: |
     **Full Changelog**: https://github.com/oliverbaehler/{{ .ProjectName }}/compare/{{ .PreviousTag }}...{{ .Tag }}
-    
+
     **Docker Images**
     - `ghcr.io/oliverbaehler/{{ .ProjectName }}:{{ .Tag }}`
     - `ghcr.io/oliverbaehler/{{ .ProjectName }}:latest`

@@ -1,19 +1,21 @@
-package controller
+package e2e
 
 import (
 	"context"
+	"log"
+	"os"
+	"testing"
+
 	"github.com/go-logr/stdr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"log"
-	"os"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"testing"
 )
 
 var (
@@ -37,7 +39,10 @@ var _ = BeforeSuite(func() {
 	ctx, cancel = context.WithCancel(context.TODO())
 
 	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{}
+	testEnv = &envtest.Environment{
+		UseExistingCluster: ptr.To(true),
+	}
+
 	var err error
 	// cfg is defined in this file globally.
 	cfg, err = testEnv.Start()

@@ -19,7 +19,7 @@ var (
 	host string
 )
 
-func FromIngressToExposure(ctx context.Context, logger logr.Logger, kubeClient client.Client, ingress networkingv1.Ingress) ([]exposure.Exposure, error) {
+func FromIngressToExposure(ctx context.Context, logger logr.Logger, kubeClient client.Client, ingress networkingv1.Ingress, static string) ([]exposure.Exposure, error) {
 	isDeleted := false
 
 	if ingress.DeletionTimestamp != nil {
@@ -50,52 +50,16 @@ func FromIngressToExposure(ctx context.Context, logger logr.Logger, kubeClient c
 		}
 
 		for _, path := range rule.HTTP.Paths {
-			namespacedName := types.NamespacedName{
-				Namespace: ingress.GetNamespace(),
-				Name:      path.Backend.Service.Name,
-			}
-			service := v1.Service{}
-			err := kubeClient.Get(ctx, namespacedName, &service)
-			if err != nil {
-				return nil, errors.Wrapf(err, "fetch service %s", namespacedName)
-			}
 
-			// Consider External Service
-			if service.Spec.ExternalName != "" {
-				host = service.Spec.ExternalName
-			} else {
-				if service.Spec.ClusterIP == "" {
-					return nil, errors.Errorf("service %s has no cluster ip", namespacedName)
+			target := static
+			if static == "" {
+				target, err = buildTargetFromService(ctx, kubeClient, ingress, path, scheme)
+				if err != nil {
+					return nil, errors.Wrap(err, "build target from service")
 				}
-
-				if service.Spec.ClusterIP == "None" {
-					return nil, errors.Errorf("service %s has None for cluster ip, headless service is not supported", namespacedName)
-				}
-
-				host = service.Spec.ClusterIP
 			}
 
-			var port int32
-			if path.Backend.Service.Port.Name != "" {
-				ok, extractedPort := getPortWithName(service.Spec.Ports, path.Backend.Service.Port.Name)
-				if !ok {
-					return nil, errors.Errorf("service %s has no port named %s", namespacedName, path.Backend.Service.Port.Name)
-				}
-				port = extractedPort
-			} else {
-				port = path.Backend.Service.Port.Number
-			}
-
-			// TODO: support other path types
-			if path.PathType == nil {
-				return nil, errors.Errorf("path type in ingress %s/%s is nil", ingress.GetNamespace(), ingress.GetName())
-			}
-			if *path.PathType != networkingv1.PathTypePrefix {
-				return nil, errors.Errorf("path type in ingress %s/%s is %s, which is not supported", ingress.GetNamespace(), ingress.GetName(), *path.PathType)
-			}
-
-			// Target
-			target := fmt.Sprintf("%s://%s:%d", scheme, host, port)
+			logger.Info("elected target", "target", target)
 
 			// TLS Verification
 			if strings.HasPrefix(target, "https://") {
@@ -120,4 +84,61 @@ func FromIngressToExposure(ctx context.Context, logger logr.Logger, kubeClient c
 	}
 
 	return result, nil
+}
+
+func buildTargetFromService(
+	ctx context.Context,
+	kubeClient client.Client,
+	ingress networkingv1.Ingress,
+	path networkingv1.HTTPIngressPath,
+	scheme string,
+) (target string, err error) {
+	namespacedName := types.NamespacedName{
+		Namespace: ingress.GetNamespace(),
+		Name:      path.Backend.Service.Name,
+	}
+	service := v1.Service{}
+	err = kubeClient.Get(ctx, namespacedName, &service)
+	if err != nil {
+		return "", errors.Wrapf(err, "fetch service %s", namespacedName)
+	}
+
+	// Consider External Service
+	if service.Spec.ExternalName != "" {
+		host = service.Spec.ExternalName
+	} else {
+		if service.Spec.ClusterIP == "" {
+			return "", errors.Errorf("service %s has no cluster ip", namespacedName)
+		}
+
+		if service.Spec.ClusterIP == "None" {
+			return "", errors.Errorf("service %s has None for cluster ip, headless service is not supported", namespacedName)
+		}
+
+		host = service.Spec.ClusterIP
+	}
+
+	var port int32
+	if path.Backend.Service.Port.Name != "" {
+		ok, extractedPort := getPortWithName(service.Spec.Ports, path.Backend.Service.Port.Name)
+		if !ok {
+			return "", errors.Errorf("service %s has no port named %s", namespacedName, path.Backend.Service.Port.Name)
+		}
+		port = extractedPort
+	} else {
+		port = path.Backend.Service.Port.Number
+	}
+
+	// TODO: support other path types
+	if path.PathType == nil {
+		return "", errors.Errorf("path type in ingress %s/%s is nil", ingress.GetNamespace(), ingress.GetName())
+	}
+	if *path.PathType != networkingv1.PathTypePrefix {
+		return "", errors.Errorf("path type in ingress %s/%s is %s, which is not supported", ingress.GetNamespace(), ingress.GetName(), *path.PathType)
+	}
+
+	// Target
+	target = fmt.Sprintf("%s://%s:%d", scheme, host, port)
+
+	return
 }

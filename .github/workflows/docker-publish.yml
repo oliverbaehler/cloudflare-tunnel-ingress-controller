@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-      id-token: write 
+      id-token: write
     outputs:
       container-digest: ${{ steps.publish.outputs.digest }}
     steps:
@@ -24,14 +24,6 @@ jobs:
           GIT_TAG=${GITHUB_REF##*/}
           VERSION=${GIT_TAG##v}
           echo "version=$(echo $VERSION)" >> $GITHUB_OUTPUT
-      - name: Run Trivy vulnerability (Repo)
-        uses: aquasecurity/trivy-action@fbd16365eb88e12433951383f5e99bd901fc618f # v0.12.0
-        with:
-          scan-type: 'fs'
-          ignore-unfixed: true
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
       - name: Install Cosign
         uses: sigstore/cosign-installer@11086d25041f77fe8fe7b9ea4e48e3b9192b8f19 # v3.1.2
       - name: Publish with KO
@@ -46,8 +38,8 @@ jobs:
           version: ${{ steps.extract_version.outputs.version }}
           sign-image: true
           sbom-name: cloudflare-tunnel-ingress-controller
-          sbom-repository: ghcr.io/${{ github.repository_owner }}/sbom
-          signature-repository: ghcr.io/${{ github.repository_owner }}/signatures
+          sbom-repository: ghcr.io/${{ github.repository_owner }}/cloudflare-tunnel-ingress-controller
+          signature-repository: ghcr.io/${{ github.repository_owner }}/cloudflare-tunnel-ingress-controller
           main-path: ./cmd/cloudflare-tunnel-ingress-controller/
         env:
           REPOSITORY: ${{ github.repository }}

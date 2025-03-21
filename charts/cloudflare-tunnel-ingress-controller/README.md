@@ -1,6 +1,6 @@
 #
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.0](https://img.shields.io/badge/Version-0.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Ingress Controller based on Cloudflare Tunnel
 
@@ -35,16 +35,20 @@ Major Changes to functions are documented with the version affected. **Before up
 | cloudflare.accountId | string | `""` | Cloudflare Account ID |
 | cloudflare.apiToken | string | `""` | Cloudflare API Token |
 | cloudflare.tunnelName | string | `""` | Cloudflare Tunnel Name |
+| cloudflared.image.pullPolicy | string | `"IfNotPresent"` |  |
+| cloudflared.image.repository | string | `"cloudflare/cloudflared"` |  |
+| cloudflared.image.tag | string | `"latest"` |  |
 | existingSecretName | string | `""` | Use an existing secret (Secret must contain `api-token`, `cloudflare-account-id` and  `cloudflare-tunnel-name` as keys) |
 | fullnameOverride | string | `""` | Full name override |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"ghcr.io/oliverbaehler/cloudflare-tunnel-ingress-controller"` | Image repository |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | Image pull secrets |
-| ingressClass.controllerValue | string | `"cloudflare-tunnel-ingress-controller"` | Ingress class controller |
+| ingressClass.controllerValue | string | `"oliverbaehler.io/cloudflare-tunnel-ingress-controller"` | Ingress class controller |
+| ingressClass.create | bool | `true` | Define if ingress class should be created |
 | ingressClass.isDefaultClass | bool | `false` | Cluster default ingress class |
 | ingressClass.name | string | `"cloudflare-tunnel"` | Ingress class name |
-| labels | object | `{}` | Deployment  |
+| labels | object | `{}` | Deployment |
 | nameOverride | string | `""` | Partial name override |
 | nodeSelector | object | `{}` | Pod Node Selector |
 | podAnnotations | object | `{}` | Additional Pod annotations |
