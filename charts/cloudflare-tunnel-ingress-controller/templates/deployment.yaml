@@ -46,7 +46,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - cloudflare-tunnel-ingress-controller
+            - controller
+          args:
             - --ingress-class={{ .Values.ingressClass.name }}
             - --controller-class={{ include "cloudflare-tunnel-ingress-controller.controllerclass" $ }}
             - --cloudflare-api-token=$(CLOUDFLARE_API_TOKEN)
