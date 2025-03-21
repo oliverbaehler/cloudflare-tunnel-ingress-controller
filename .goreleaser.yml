@@ -9,7 +9,7 @@ gomod:
   proxy: true
 
 builds:
-  - main: cmd/{{ .ProjectName }}/main.go
+  - main: cmd/controller/main.go
     binary: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
     env:
       - CGO_ENABLED=0
@@ -24,9 +24,9 @@ builds:
     mod_timestamp: '{{ .CommitTimestamp }}'
     ldflags:
       - >-
-        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.Version={{ .Tag }}
-        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.GitCommit={{ .Commit }}
-        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/{{ .ProjectName }}/cmd.BuildDate={{ .Date }}
+        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/controller/cmd.Version={{ .Tag }}
+        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/controller/cmd.GitCommit={{ .Commit }}
+        -X github.com/oliverbaehler/{{ .ProjectName }}/cmd/controller/cmd.BuildDate={{ .Date }}
 release:
   footer: |
     **Full Changelog**: https://github.com/oliverbaehler/{{ .ProjectName }}/compare/{{ .PreviousTag }}...{{ .Tag }}
