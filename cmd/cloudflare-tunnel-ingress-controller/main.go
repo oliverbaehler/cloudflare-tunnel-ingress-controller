@@ -19,15 +19,9 @@ import (
 
 type rootCmdFlags struct {
 	logger logr.Logger
-	// for annotation on Ingress
-	ingressClass string
 	// for IngressClass.spec.controller
-	controllerClass      string
-	logLevel             int
-	cloudflareAPIToken   string
-	cloudflareAccountId  string
-	cloudflareTunnelName string
-	namespace            string
+	ingressClass, controllerClass, cloudflareAPIToken, cloudflareAccountId, cloudflareTunnelName, namespace, staticBackend string
+	logLevel                                                                                                               int
 }
 
 func main() {
@@ -85,6 +79,7 @@ func main() {
 					IngressClassName:    options.ingressClass,
 					ControllerClassName: options.controllerClass,
 					CFTunnelClient:      tunnelClient,
+					StaticBackend:       options.staticBackend,
 				})
 			if err != nil {
 				return err
@@ -120,6 +115,7 @@ func main() {
 	rootCommand.PersistentFlags().StringVar(&options.cloudflareAccountId, "cloudflare-account-id", options.cloudflareAccountId, "cloudflare account id")
 	rootCommand.PersistentFlags().StringVar(&options.cloudflareTunnelName, "cloudflare-tunnel-name", options.cloudflareTunnelName, "cloudflare tunnel name")
 	rootCommand.PersistentFlags().StringVar(&options.namespace, "namespace", options.namespace, "namespace to execute cloudflared connector")
+	rootCommand.PersistentFlags().StringVar(&options.staticBackend, "backend", options.staticBackend, "static backend to use for alle ingresses in cloudflared")
 
 	err := rootCommand.Execute()
 	if err != nil {

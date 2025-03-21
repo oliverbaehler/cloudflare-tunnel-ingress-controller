@@ -1,0 +1,196 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "affinity": {
+            "properties": {},
+            "type": "object"
+        },
+        "anotations": {
+            "properties": {},
+            "type": "object"
+        },
+        "cloudflare": {
+            "properties": {
+                "accountId": {
+                    "type": "string"
+                },
+                "apiToken": {
+                    "type": "string"
+                },
+                "tunnelName": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "cloudflared": {
+            "properties": {
+                "image": {
+                    "properties": {
+                        "pullPolicy": {
+                            "type": "string"
+                        },
+                        "repository": {
+                            "type": "string"
+                        },
+                        "tag": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "existingSecretName": {
+            "type": "string"
+        },
+        "fullnameOverride": {
+            "type": "string"
+        },
+        "image": {
+            "properties": {
+                "pullPolicy": {
+                    "type": "string"
+                },
+                "repository": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "imagePullSecrets": {
+            "type": "array"
+        },
+        "ingressClass": {
+            "properties": {
+                "controllerValue": {
+                    "type": "string"
+                },
+                "isDefaultClass": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "labels": {
+            "properties": {},
+            "type": "object"
+        },
+        "nameOverride": {
+            "type": "string"
+        },
+        "nodeSelector": {
+            "properties": {},
+            "type": "object"
+        },
+        "podAnnotations": {
+            "properties": {},
+            "type": "object"
+        },
+        "podLabels": {
+            "properties": {},
+            "type": "object"
+        },
+        "podSecurityContext": {
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "fsGroup": {
+                    "type": "integer"
+                },
+                "runAsNonRoot": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "replicaCount": {
+            "type": "integer"
+        },
+        "resources": {
+            "properties": {
+                "limits": {
+                    "properties": {
+                        "cpu": {
+                            "type": "string"
+                        },
+                        "memory": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "requests": {
+                    "properties": {
+                        "cpu": {
+                            "type": "string"
+                        },
+                        "memory": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "securityContext": {
+            "properties": {
+                "allowPrivilegeEscalation": {
+                    "type": "boolean"
+                },
+                "capabilities": {
+                    "properties": {
+                        "drop": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "readOnlyRootFilesystem": {
+                    "type": "boolean"
+                },
+                "runAsGroup": {
+                    "type": "integer"
+                },
+                "runAsUser": {
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "serviceAccount": {
+            "properties": {
+                "annotations": {
+                    "properties": {},
+                    "type": "object"
+                },
+                "create": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "tolerations": {
+            "type": "array"
+        }
+    },
+    "type": "object"
+}

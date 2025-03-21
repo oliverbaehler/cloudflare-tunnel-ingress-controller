@@ -15,6 +15,12 @@ cloudflare:
   # -- Cloudflare Tunnel Name
   tunnelName: ""
 
+cloudflared:
+  image:
+    repository: cloudflare/cloudflared
+    pullPolicy: IfNotPresent
+    tag: latest
+
 # -- Use an existing secret (Secret must contain `api-token`, `cloudflare-account-id` and  `cloudflare-tunnel-name` as keys)
 existingSecretName: ""
 
@@ -37,6 +43,7 @@ image:
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+
 # -- Image pull secrets
 imagePullSecrets: []
 
@@ -49,7 +56,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-# -- Deployment 
+# -- Deployment
 labels: {}
 
 # -- Deployment annotations

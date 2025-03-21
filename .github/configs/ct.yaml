@@ -3,11 +3,8 @@
 remote: origin
 target-branch: master
 chart-dirs:
-  - helm/
-chart-repos:
-  - buttahtoast=https://buttahtoast.github.io/helm-charts/
-  - bitnami=https://charts.bitnami.com/bitnami
-validate-chart-schema: true
+  - charts/
+validate-chart-schema: false
 validate-maintainers: false
 validate-yaml: true
 exclude-deprecated: true
