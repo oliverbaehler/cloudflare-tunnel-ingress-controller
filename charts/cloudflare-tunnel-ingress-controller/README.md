@@ -39,6 +39,7 @@ Major Changes to functions are documented with the version affected. **Before up
 | cloudflared.image.repository | string | `"cloudflare/cloudflared"` |  |
 | cloudflared.image.tag | string | `"latest"` |  |
 | existingSecretName | string | `""` | Use an existing secret (Secret must contain `api-token`, `cloudflare-account-id` and  `cloudflare-tunnel-name` as keys) |
+| extraArgs | list | `[]` | Additional Controller-Arguments |
 | fullnameOverride | string | `""` | Full name override |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"ghcr.io/oliverbaehler/cloudflare-tunnel-ingress-controller"` | Image repository |

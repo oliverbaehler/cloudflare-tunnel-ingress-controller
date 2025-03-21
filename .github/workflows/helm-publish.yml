@@ -37,16 +37,17 @@ jobs:
           update-dependencies: 'true' # Defaults to false
           sign-image: 'true'
           signature-repository: ghcr.io/${{ github.repository_owner }}/charts/cloudflare-tunnel-ingress-controller
-  helm-provenance:
+
+  generate-provenance:
     needs: publish-helm
     permissions:
       id-token: write   # To sign the provenance.
       packages: write   # To upload assets to release.
       actions: read     # To read the workflow path.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v1.9.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
     with:
       image: ghcr.io/${{ github.repository_owner }}/charts/cloudflare-tunnel-ingress-controller
-      digest: "${{ needs.publish-helm.outputs.chart-digest }}"
+      digest: "${{ needs.publish-images.outputs.chart-digest }}"
       registry-username: ${{ github.actor }}
     secrets:
       registry-password: ${{ secrets.GITHUB_TOKEN }}

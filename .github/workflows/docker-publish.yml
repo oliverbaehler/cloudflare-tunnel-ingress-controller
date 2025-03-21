@@ -54,7 +54,7 @@ jobs:
           main-path: ./cmd/controller
         env:
           REPOSITORY: ${{ github.repository }}
-  generate-capsule-provenance:
+  generate-provenance:
     needs: publish-images
     permissions:
       id-token: write   # To sign the provenance.

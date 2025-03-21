@@ -45,6 +45,9 @@
         "existingSecretName": {
             "type": "string"
         },
+        "extraArgs": {
+            "type": "array"
+        },
         "fullnameOverride": {
             "type": "string"
         },
