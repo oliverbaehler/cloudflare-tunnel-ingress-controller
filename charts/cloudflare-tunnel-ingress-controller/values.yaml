@@ -28,9 +28,11 @@ ingressClass:
   # -- Ingress class name
   name: cloudflare-tunnel
   # -- Ingress class controller
-  controllerValue: ""
+  controllerValue: "oliverbaehler.io/cloudflare-tunnel-ingress-controller"
   # -- Cluster default ingress class
   isDefaultClass: false
+  # -- Define if ingress class should be created
+  create: true
 
 # -- Replicas
 replicaCount: 1

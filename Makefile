@@ -42,7 +42,8 @@ golint-fix: golangci-lint
 
 
 # Docker Image
-KOCACHE             ?= /tmp/ko-cache
+KO_PLATFORM     ?= linux/$(GOARCH)
+KOCACHE         ?= /tmp/ko-cache
 KO_TAGS         ?= "latest"
 ifdef VERSION
 KO_TAGS         := $(KO_TAGS),$(VERSION)
@@ -62,7 +63,7 @@ LD_FLAGS        := "-X main.Version=$(VERSION) \
 ko-build-controller: ko
 	@echo Building Controller $(FULL_IMG) - $(KO_TAGS) >&2
 	@LD_FLAGS=$(LD_FLAGS) KOCACHE=$(KOCACHE) KO_DOCKER_REPO=$(FULL_IMG) \
-		$(KO) build ./cmd/ --bare --tags=$(KO_TAGS) --push=false --local --platform=$(KO_PLATFORM)
+		$(KO) build ./cmd/controller/ --bare --tags=$(KO_TAGS) --push=false --local --platform=$(KO_PLATFORM)
 
 .PHONY: ko-build-all
 ko-build-all: ko-build-controller
@@ -81,7 +82,7 @@ ko-login: ko
 ko-publish-controller: ko-login
 	@echo Publishing Controller $(FULL_IMG) - $(KO_TAGS) >&2
 	@LD_FLAGS=$(LD_FLAGS) KOCACHE=$(KOCACHE) KO_DOCKER_REPO=$(FULL_IMG) \
-		$(KO) build ./cmd/ --bare --tags=$(KO_TAGS) --push=true
+		$(KO) build ./cmd/controller/ --bare --tags=$(KO_TAGS) --push=true
 
 .PHONY: ko-publish-all
 ko-publish-all: ko-publish-controller
@@ -109,7 +110,6 @@ helm-schema: helm-plugin-schema
 
 helm-test: kind ct
 	@$(KIND) create cluster --wait=60s --name $(KIND_K8S_NAME) --image=kindest/node:$(KIND_K8S_VERSION)
-	@$(MAKE) e2e-install-distro
 	@$(MAKE) helm-test-exec
 	@$(KIND) delete cluster --name $(KIND_K8S_NAME)
 

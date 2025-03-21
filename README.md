@@ -55,7 +55,7 @@ helm upgrade --install --wait \
   -n cloudflare-tunnel-ingress-controller --create-namespace \
   cloudflare-tunnel-ingress-controller \
   cloudflare-ingress-controller/cloudflare-tunnel-ingress-controller \
-  --set=cloudflare.apiToken="<cloudflare-api-token>",cloudflare.accountId="<cloudflare-account-id>",cloudflare.tunnelName="<your-favorite-tunnel-name>" 
+  --set=cloudflare.apiToken="<cloudflare-api-token>",cloudflare.accountId="<cloudflare-account-id>",cloudflare.tunnelName="<your-favorite-tunnel-name>"
 ```
 
 > if the tunnel does not exist, controller will create it for you.

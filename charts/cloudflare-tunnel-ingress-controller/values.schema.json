@@ -70,6 +70,9 @@
                 "controllerValue": {
                     "type": "string"
                 },
+                "create": {
+                    "type": "boolean"
+                },
                 "isDefaultClass": {
                     "type": "boolean"
                 },

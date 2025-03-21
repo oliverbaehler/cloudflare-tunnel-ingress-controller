@@ -44,7 +44,8 @@ Major Changes to functions are documented with the version affected. **Before up
 | image.repository | string | `"ghcr.io/oliverbaehler/cloudflare-tunnel-ingress-controller"` | Image repository |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | Image pull secrets |
-| ingressClass.controllerValue | string | `""` | Ingress class controller |
+| ingressClass.controllerValue | string | `"oliverbaehler.io/cloudflare-tunnel-ingress-controller"` | Ingress class controller |
+| ingressClass.create | bool | `true` | Define if ingress class should be created |
 | ingressClass.isDefaultClass | bool | `false` | Cluster default ingress class |
 | ingressClass.name | string | `"cloudflare-tunnel"` | Ingress class name |
 | labels | object | `{}` | Deployment |

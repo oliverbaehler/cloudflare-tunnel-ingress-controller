@@ -4,6 +4,6 @@ defaultPlatforms:
 builds:
 - id: cloudflare-tunnel-ingress-controller
   dir: ./
-  main: ./cmd/cloudflare-tunnel-ingress-controller/
+  main: ./cmd/controller/
   ldflags:
   - '{{ if index .Env "LD_FLAGS" }}{{ .Env.LD_FLAGS }}{{ end }}'
