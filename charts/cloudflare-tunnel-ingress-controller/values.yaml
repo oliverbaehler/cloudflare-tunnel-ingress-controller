@@ -45,6 +45,9 @@ image:
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+# -- Additional Controller-Arguments
+extraArgs: []
+# - --backend=https://nginx-controller:443
 
 # -- Image pull secrets
 imagePullSecrets: []
